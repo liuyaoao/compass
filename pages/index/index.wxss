@@ -1,8 +1,16 @@
 /**index.wxss**/
+.compass{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .userinfo {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: absolute;
+  bottom:20px;
+  vertical-align: bottom;
 }
 
 .userinfo-avatar {
@@ -16,6 +24,3 @@
   color: #aaa;
 }
 
-.usermotto {
-  margin-top: 200px;
-}
