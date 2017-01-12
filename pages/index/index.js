@@ -36,14 +36,14 @@ Page({
         userInfo:userInfo
       })
     });
-    that.getDeviceSystemInfo();
+    that.getDeviceSystemInfo(); //获取设备的系统信息。
     var leftHeight = that.data.height-70;
     var radius = that.data.width*0.35;
     if(that.data.width>(leftHeight+50)){
       radius = (leftHeight-50)/2;
     }
     var circleX = that.data.width/2;
-    var circleY = (that.data.height-35-radius)/2;
+    var circleY = (that.data.height-radius+6)/2;
     that.setData({
         canvasWidth:that.data.width,
         canvasHeight:leftHeight,
@@ -52,12 +52,11 @@ Page({
         circleY:circleY
     });
 
-    //////开始画圆形罗盘了。
+    //开始画圆形罗盘了。
     zr = wezrender.zrender.init("compass_canvas", that.data.width, leftHeight);
     // var gradient = new wezrender.graphic.LinearGradient();
     // gradient.addColorStop(0, '#A8A7AD');
     // gradient.addColorStop(1, '#A8A7AD');
-
     var circle = new wezrender.graphic.shape.Circle({
         shape: {
             cx: circleX,
@@ -78,16 +77,17 @@ Page({
     var flag = 0;
     wx.onCompassChange(function (res) {
       // console.log(res.direction)
-      flag++;
-      if(flag%10 == 0){
+      if(flag%6 == 0){
         that.drawScaleDial(360-res.direction,true);
         console.log("direction:"+res.direction)
       }
+      flag++;
       if(flag == 100000000000){
-        flag=1;
+        flag=0;
       }
     });
   },
+  // 画盘刻度和方向文字。
   drawScaleDial:function(offsetAngle,isUpdate){
     var that = this;
     var isUpdate = isUpdate || false;
@@ -160,6 +160,7 @@ Page({
     });
     zr.add(pin);
   },
+  //获取设备的系统信息。
   getDeviceSystemInfo:function(){
     var that = this;
     try {
@@ -167,7 +168,7 @@ Page({
       that.setData({
         pixelRatio:res.pixelRatio,
         width:res.windowWidth,
-        height:res.windowHeight,
+        height:res.windowHeight-120,
       });
       console.log(res.model)
       console.log(res.pixelRatio)
