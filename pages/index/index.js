@@ -4,7 +4,7 @@
 var app = getApp();
 var wezrender = require('../../lib/wezrender');
 var utils = require('../../utils/util');
-var zr = null;
+var zr = null,zr_pointer = null;
 
 Page({
   data: {
@@ -18,6 +18,7 @@ Page({
     circleY:0,
     scaleDialArr:[],
     directionTextMap:{},
+    rotateDegree:90,
     userInfo: {}
   },
   //事件处理函数
@@ -51,9 +52,10 @@ Page({
         circleX:circleX,
         circleY:circleY
     });
-
+const ctx = wx.createCanvasContext('compassPointer_canvas');
     //开始画圆形罗盘了。
     zr = wezrender.zrender.init("compass_canvas", that.data.width, leftHeight);
+    zr_pointer = wezrender.zrender.init("compassPointer_canvas", 30, 80);
     // var gradient = new wezrender.graphic.LinearGradient();
     // gradient.addColorStop(0, '#A8A7AD');
     // gradient.addColorStop(1, '#A8A7AD');
@@ -74,12 +76,18 @@ Page({
     that.drawScaleDial(0);
     var Pin = utils.getCustomGraphPin(wezrender,that.data.circleX,that.data.circleY);
     that.drawPinPointer(Pin);
+
+    // ctx.rotate(45 * Math.PI / 180)
+    // ctx.draw()
     var flag = 0;
     wx.onCompassChange(function (res) {
       // console.log(res.direction)
       if(flag%6 == 0){
+        // that.setData({
+        //   rotateDegree:res.direction
+        // });
         that.drawScaleDial(360-res.direction,true);
-        console.log("direction:"+res.direction)
+        // console.log("direction:"+res.direction)
       }
       flag++;
       if(flag == 100000000000){
@@ -147,18 +155,19 @@ Page({
         that.data.directionTextMap[direction] = utils.drawText(zr,wezrender,tx,ty,direction);
       }
   },
+  //画指针。
   drawPinPointer:function(Pin){
     var that = this;
     var pin = new Pin({
         shape: {
-            x: that.data.circleX,
-            y: that.data.circleY,
+            x: 15,
+            y: 80,
             width: 30,
             height: 80
         },
-        scale: [1, 1,that.data.circleX,that.data.circleY]
+        scale: [1, 1,0,0]
     });
-    zr.add(pin);
+    zr_pointer.add(pin);
   },
   //获取设备的系统信息。
   getDeviceSystemInfo:function(){

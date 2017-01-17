@@ -5,7 +5,11 @@
   </view>
   <view class="canvasContainer" style="">
       <canvas style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;" canvas-id="compass_canvas"></canvas>
-    </view>
+      <view class="compassPointer" style="top:{{circleY-80}}px;left:{{circleX-80}}px;">
+        <canvas style="width:{{160}}px;height:{{160}}px;" canvas-id="compassPointer_canvas"></canvas>
+      </view>
+  </view>
+  
   <view  bindtap="bindViewTap" class="userinfo">
     <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
     <text class="userinfo-nickname">欢迎使用，{{userInfo.nickName}}先生</text>

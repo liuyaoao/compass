@@ -5,7 +5,12 @@
   align-items: center;
 }
 .canvasContainer{
+  position:relative;
   margin-top:20rpx;
+}
+.compassPointer{
+  position:absolute;
+  /*transform:rotate({{rotateDegree}}deg);*/
 }
 .userinfo {
   display: flex;
