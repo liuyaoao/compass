@@ -5,6 +5,7 @@ var app = getApp();
 var wezrender = require('../../lib/wezrender');
 var utils = require('../../utils/util');
 var zr = null,zr_pointer = null;
+var pointerCtx = null;
 
 Page({
   data: {
@@ -18,7 +19,8 @@ Page({
     circleY:0,
     scaleDialArr:[],
     directionTextMap:{},
-    rotateDegree:90,
+    rotateDegree:0,
+    animationData: {},
     userInfo: {}
   },
   //事件处理函数
@@ -52,7 +54,7 @@ Page({
         circleX:circleX,
         circleY:circleY
     });
-const ctx = wx.createCanvasContext('compassPointer_canvas');
+    pointerCtx = wx.createCanvasContext('compassPointer_canvas');
     //开始画圆形罗盘了。
     zr = wezrender.zrender.init("compass_canvas", that.data.width, leftHeight);
     zr_pointer = wezrender.zrender.init("compassPointer_canvas", 30, 80);
@@ -77,17 +79,20 @@ const ctx = wx.createCanvasContext('compassPointer_canvas');
     var Pin = utils.getCustomGraphPin(wezrender,that.data.circleX,that.data.circleY);
     that.drawPinPointer(Pin);
 
-    // ctx.rotate(45 * Math.PI / 180)
-    // ctx.draw()
+    pointerCtx.translate(80, 80);//这句是把指针的原点移到圆盘的中心点点。
+    pointerCtx.rotate(180 * Math.PI / 180); //这句是把指针倒转一下，使指针尖的一头指向外面。
+    // pointerCtx.rotate(270 * Math.PI / 180)
+    pointerCtx.draw();
+
     var flag = 0;
     wx.onCompassChange(function (res) {
-      // console.log(res.direction)
-      if(flag%6 == 0){
-        // that.setData({
-        //   rotateDegree:res.direction
-        // });
+      if(flag%10 == 0){
+      
         that.drawScaleDial(360-res.direction,true);
-        // console.log("direction:"+res.direction)
+        // pointerCtx.translate(80, 80);
+        // pointerCtx.rotate(180 * Math.PI / 180);
+        // pointerCtx.rotate((360-res.direction) * Math.PI / 180)
+        // pointerCtx.draw();
       }
       flag++;
       if(flag == 100000000000){
@@ -98,6 +103,7 @@ const ctx = wx.createCanvasContext('compassPointer_canvas');
   // 画盘刻度和方向文字。
   drawScaleDial:function(offsetAngle,isUpdate){
     var that = this;
+    
     var isUpdate = isUpdate || false;
     var startX=0,startY=0,endX=0,endY=0;
     for(var i=1;i<=16;i++){ //分16个刻度
@@ -133,7 +139,7 @@ const ctx = wx.createCanvasContext('compassPointer_canvas');
             y2:endY
         }).start();
       }else{
-        console.log("startx,starty,endx,endy:"+startX+","+startY+","+endX+","+endY);
+        // console.log("startx,starty,endx,endy:"+startX+","+startY+","+endX+","+endY);
         that.data.scaleDialArr[i-1] = utils.drawLine(zr,wezrender,startX,startY,endX,endY,lineColor);
       }
     }
@@ -160,7 +166,7 @@ const ctx = wx.createCanvasContext('compassPointer_canvas');
     var that = this;
     var pin = new Pin({
         shape: {
-            x: 15,
+            x: 0,
             y: 80,
             width: 30,
             height: 80
@@ -189,6 +195,20 @@ const ctx = wx.createCanvasContext('compassPointer_canvas');
     } catch (e) {
       // Do something when catch error
     }
+  },
+  openLocationMap:function(){
+    wx.getLocation({
+      type: 'gcj02', //返回可以用于wx.openLocation的经纬度
+      success: function(res) {
+        var latitude = res.latitude
+        var longitude = res.longitude
+        wx.openLocation({
+          latitude: latitude,
+          longitude: longitude,
+          scale: 28
+        })
+      }
+    });
   },
   onUnload:function(){  
       if (zr)  {

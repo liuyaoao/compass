@@ -1,7 +1,7 @@
 <!--index.wxml-->
 <view class="container">
-  <view class="compass">
-    <button class="" size="mini" type="primary">切换模式</button>
+  <view class="compass" bindtap="openLocationMap">
+    <button class="" size="mini" type="primary">打开地图</button>
   </view>
   <view class="canvasContainer" style="">
       <canvas style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;" canvas-id="compass_canvas"></canvas>
